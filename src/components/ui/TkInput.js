@@ -1,0 +1,570 @@
+import {
+  BitmapText,
+  Container,
+  FederatedPointerEvent,
+  Sprite,
+  TilingSprite,
+} from "pixi.js";
+import tkSheets from "../../TkSheets.js";
+import { focusElement, gridToPixel } from "../../utils.js";
+import { TK_FONT_SIZE, TK_TILE_SIZE } from "../../GLOBALS.js";
+
+/**
+ * @global
+ * @typedef TkInputOptions
+ * @property {string} [tkValue] - The string to put in the input
+ * @property {number} [tkGridX] - The x position of the input in the grid
+ * @property {number} [tkGridY] - The y position of the input in the grid
+ * @property {number} [tkGridWidth] - The width of the input in grid units (e.g. 2 creates a 2 tiles wide input)
+ *
+ */
+
+/**
+ * A text input
+ */
+class TkInput extends Container {
+  /**
+   * @param {TkInputOptions} options
+   */
+  constructor(options) {
+    // initialize default values
+    const tkValue = options.tkValue ?? "";
+    const tkGridX = options.tkGridX ?? 0;
+    const tkGridY = options.tkGridY ?? 0;
+    const tkGridWidth = options.tkGridWidth ?? 2;
+
+    // extract options to assign to the pixijs Container
+    const containerOptions = {
+      x: gridToPixel(tkGridX),
+      y: gridToPixel(tkGridY),
+    };
+
+    // call super constructor to initialize container
+    super(containerOptions);
+
+    /** @private */
+    this._tkValue = tkValue;
+
+    /** @private */
+    this._tkGridX = tkGridX;
+
+    /** @private */
+    this._tkGridX = tkGridX;
+
+    /** @private */
+    this._tkGridY = tkGridY;
+
+    /** @private */
+    this._tkGridWidth = tkGridWidth;
+
+    /** @private */
+    this._tkGridHeight = 1;
+
+    /** @private */
+    this._tkIsHovering = false;
+
+    /** @private */
+    this._tkIsDisabled = false;
+
+    /** @private */
+    this._tkIsFocused = false;
+
+    /** @private */
+    this._tkCursorPos = tkValue.length;
+
+    /** @private */
+    this._tkFirstCharIndex = 0;
+
+    /** @private */
+    this._tkMaxChars = this._tkGridWidth * 3 - 2;
+
+    /** @private @type {string} */
+    this._id = crypto.randomUUID();
+
+    this._tkCreateElements();
+
+    this._tkAttachEvents();
+    this._tkUpdateVisuals();
+  }
+
+  /**
+   * Attaches events to the container
+   * @private
+   * @returns {void}
+   */
+  _tkAttachEvents() {
+    this.eventMode = "static";
+    this.on("pointerdown", this._onPointerDown, this);
+  }
+
+  /**
+   * Creates the elements inside the container
+   * @private
+   * @returns {void}
+   */
+  _tkCreateElements() {
+    /**
+     * left tile input sprite, normal state
+     * @private
+     * @type {Sprite}
+     */
+    this.tkNormalLeftSprite = new Sprite(
+      tkSheets.guiSheet.textures[`input-normal-left.png`]
+    );
+
+    /**
+     * center tile input sprite, normal state
+     * @private
+     * @type {TilingSprite}
+     */
+    this.tkNormalCenterSprite = new TilingSprite(
+      tkSheets.guiSheet.textures[`input-normal-center.png`]
+    );
+
+    /**
+     * right tile input sprite, normal state
+     * @private
+     * @type {Sprite}
+     */
+    this.tkNormalRightSprite = new Sprite(
+      tkSheets.guiSheet.textures[`input-normal-right.png`]
+    );
+
+    // disabled input states
+
+    /**
+     * left tile input sprite, disabled state
+     * @private
+     * @type {Sprite}
+     */
+    this.tkDisabledLeftSprite = new Sprite(
+      tkSheets.guiSheet.textures[`input-disabled-left.png`]
+    );
+
+    /**
+     * center tile input sprite, disabled state
+     * @private
+     * @type {TilingSprite}
+     */
+    this.tkDisabledCenterSprite = new TilingSprite(
+      tkSheets.guiSheet.textures[`input-disabled-center.png`]
+    );
+
+    /**
+     * right tile input sprite, disabled state
+     * @private
+     * @type {Sprite}
+     */
+    this.tkDisabledRightSprite = new Sprite(
+      tkSheets.guiSheet.textures[`input-disabled-right.png`]
+    );
+
+    // focused input states
+
+    /**
+     * left tile input sprite, focused state
+     * @private
+     * @type {Sprite}
+     */
+    this.tkFocusedLeftSprite = new Sprite(
+      tkSheets.guiSheet.textures[`input-focused-left.png`]
+    );
+
+    /**
+     * center tile input sprite, focused state
+     * @private
+     * @type {TilingSprite}
+     */
+    this.tkFocusedCenterSprite = new TilingSprite(
+      tkSheets.guiSheet.textures[`input-focused-center.png`]
+    );
+
+    /**
+     * right tile input sprite, disabled state
+     * @private
+     * @type {Sprite}
+     */
+    this.tkFocusedRightSprite = new Sprite(
+      tkSheets.guiSheet.textures[`input-focused-right.png`]
+    );
+
+    // create container for the three different states
+
+    /**
+     * Container for the normal input state (contains the normal state sprites)
+     * @private
+     * @type {Container}
+     */
+    this.tkNormalInput = new Container();
+
+    /**
+     * Container for the disabled input state (contains the hover state sprites)
+     * @private
+     * @type {Container}
+     */
+    this.tkDisabledInput = new Container();
+
+    /**
+     * Container for the focused input state (contains the hover state sprites)
+     * @private
+     * @type {Container}
+     */
+    this.tkFocusedInput = new Container();
+
+    // add sprites to the different state containers
+    if (this._tkGridWidth === 2) {
+      this.tkNormalRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkDisabledRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkFocusedRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkNormalInput.addChild(
+        this.tkNormalLeftSprite,
+        this.tkNormalRightSprite
+      );
+      this.tkDisabledInput.addChild(
+        this.tkDisabledLeftSprite,
+        this.tkDisabledRightSprite
+      );
+      this.tkFocusedInput.addChild(
+        this.tkFocusedLeftSprite,
+        this.tkFocusedRightSprite
+      );
+    } else {
+      this.tkNormalRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkDisabledRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkFocusedRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+
+      this.tkNormalCenterSprite.x = gridToPixel(1);
+      this.tkNormalCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
+      this.tkDisabledCenterSprite.x = gridToPixel(1);
+      this.tkDisabledCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
+      this.tkFocusedCenterSprite.x = gridToPixel(1);
+      this.tkFocusedCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
+
+      this.tkNormalInput.addChild(
+        this.tkNormalLeftSprite,
+        this.tkNormalCenterSprite,
+        this.tkNormalRightSprite
+      );
+      this.tkDisabledInput.addChild(
+        this.tkDisabledLeftSprite,
+        this.tkDisabledCenterSprite,
+        this.tkDisabledRightSprite
+      );
+      this.tkFocusedInput.addChild(
+        this.tkFocusedLeftSprite,
+        this.tkFocusedCenterSprite,
+        this.tkFocusedRightSprite
+      );
+    }
+
+    // creating the cursor element
+    this.tkCursor = new Sprite(tkSheets.guiSheet.textures["neutral-10.png"]);
+    this.tkCursor.width = TK_FONT_SIZE / 2;
+    this.tkCursor.height = 2;
+    this.tkCursor.visible = false;
+
+    // creating the text element
+
+    /**
+     * Text element of the input
+     * @private
+     * @type {BitmapText}
+     */
+    this.tkText = new BitmapText({
+      text: this._tkValue,
+      style: {
+        fontFamily: `PixelOperatorMono-Bold-${TK_FONT_SIZE}`,
+        fontSize: TK_FONT_SIZE,
+      },
+    });
+    this.tkText.x = 4;
+    this.tkText.y = 0;
+    this.tkText.tint = "#ebdbb2";
+
+    // adding elements to the main container
+    this.addChild(
+      this.tkNormalInput,
+      this.tkDisabledInput,
+      this.tkFocusedInput,
+      this.tkText,
+      this.tkCursor
+    );
+  }
+
+  /**
+   * Runs every time a property of the input changes, updates the input appearence.
+   * @private
+   */
+  _tkUpdateVisuals() {
+    // make sure elements are defined
+    if (
+      !this.tkText ||
+      !this.tkNormalInput ||
+      !this.tkDisabledInput ||
+      !this.tkFocusedInput
+    ) {
+      return;
+    }
+
+    // Update text content
+    const displayText = this._tkValue.slice(
+      this._tkFirstCharIndex,
+      this._tkFirstCharIndex + this._tkMaxChars
+    );
+    this.tkText.text = displayText;
+
+    // Update sprite visibilities and states
+    if (this._tkIsDisabled) {
+      // disabled state
+      this.tkNormalInput.visible = false;
+      this.tkFocusedInput.visible = false;
+      this.tkDisabledInput.visible = true;
+    } else if (this._tkIsFocused) {
+      console.log("rendering focused sprite");
+      // focused state
+      this.tkNormalInput.visible = false;
+      this.tkFocusedInput.visible = true;
+      this.tkDisabledInput.visible = false;
+    } else {
+      // Normal state
+      this.tkNormalInput.visible = true;
+      this.tkFocusedInput.visible = false;
+      this.tkDisabledInput.visible = false;
+    }
+  }
+
+  /**
+   * Runs every time a the cursor position changes
+   * @private
+   */
+  _tkUpdateCursor() {
+    if (!this.tkCursor || !this.tkText) {
+      return;
+    }
+
+    if (this._tkIsFocused) {
+      this.tkCursor.visible = true;
+    } else {
+      this.tkCursor.visible = false;
+    }
+
+    this.tkCursor.x =
+      this.tkText.x +
+      ((this._tkCursorPos - this._tkFirstCharIndex) * TK_FONT_SIZE) / 2;
+    this.tkCursor.y = this.tkText.y + TK_FONT_SIZE;
+  }
+
+  /**
+   * Handler for the pointerdown event
+   * @private
+   * @param {FederatedPointerEvent} e - the pixijs event
+   */
+  _onPointerDown(e) {
+    if (!this._tkIsDisabled) {
+      focusElement(this);
+      this._tkUpdateVisuals();
+    }
+  }
+
+  /**
+   * Handler for the global keydown event
+   * @param {KeyboardEvent} e - the DOM event
+   */
+  onKeyDown = (e) => {
+    if (this._tkIsDisabled || !this._tkIsFocused) {
+      return;
+    }
+
+    // Prevent default for space/arrow keys to avoid browser actions
+    if (e.key === " " || e.key.startsWith("Arrow")) {
+      e.preventDefault();
+    }
+
+    switch (e.key) {
+      case "Enter":
+        // TODO: emit submit event
+        console.log("Input submitted:", this._tkValue); // Replace with your logic
+        focusElement(undefined);
+        break;
+      case "Backspace":
+        if (this._tkCursorPos > 0) {
+          const newValue =
+            this._tkValue.slice(0, this._tkCursorPos - 1) +
+            this._tkValue.slice(this._tkCursorPos);
+          this._tkCursorPos--;
+          this.tkValue = newValue;
+        }
+        if (this._tkFirstCharIndex > 0) {
+          this._tkFirstCharIndex--;
+        }
+        break;
+      case "Delete":
+        break;
+      case "ArrowLeft":
+        if (this._tkCursorPos > 0) {
+          this._tkCursorPos--;
+        }
+        if (
+          this._tkFirstCharIndex === this._tkCursorPos + 1 &&
+          this._tkFirstCharIndex > 0
+        ) {
+          this._tkFirstCharIndex--;
+        }
+        break;
+      case "ArrowRight":
+        if (this._tkCursorPos < this._tkValue.length) {
+          this._tkCursorPos++;
+        }
+        if (
+          this._tkCursorPos === this._tkFirstCharIndex + this._tkMaxChars + 1 &&
+          this._tkCursorPos <= this._tkValue.length
+        ) {
+          this._tkFirstCharIndex++;
+        }
+        break;
+      // Add Home/End if needed: e.key === "Home" -> _tkCursorPos = 0; etc.
+      default:
+        // Handle printable characters (alphanumeric, symbols)
+        if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+          this._tkCursorPos++;
+          if (this._tkCursorPos > this._tkMaxChars) {
+            this._tkFirstCharIndex++;
+          }
+          const newValue =
+            this._tkValue.slice(0, this._tkCursorPos) +
+            e.key +
+            this._tkValue.slice(this._tkCursorPos);
+          this.tkValue = newValue;
+        }
+        break;
+    }
+
+    this._tkUpdateVisuals();
+    this._tkUpdateCursor();
+  };
+
+  /**
+   * The text content of the input
+   * @type {string}
+   */
+  get tkValue() {
+    return this._tkValue;
+  }
+
+  set tkValue(value) {
+    if (this._tkValue !== value) {
+      this._tkValue = value;
+      this._tkUpdateVisuals();
+    }
+  }
+
+  /**
+   * The X grid position of the input
+   * @type {number}
+   */
+  get tkGridX() {
+    return this._tkGridX;
+  }
+
+  set tkGridX(value) {
+    if (this._tkGridX !== value) {
+      this._tkGridX = value;
+      this._tkUpdateVisuals();
+    }
+  }
+
+  /**
+   * The Y grid position of the input
+   * @type {number}
+   */
+  get tkGridY() {
+    return this._tkGridY;
+  }
+
+  set tkGridY(value) {
+    if (this._tkGridY !== value) {
+      this._tkGridY = value;
+      this._tkUpdateVisuals();
+    }
+  }
+
+  /**
+   * The width of the input in grid units
+   * @type {number}
+   */
+  get tkGridWidth() {
+    return this._tkGridWidth;
+  }
+
+  /**
+   * The height of the input in grid units
+   * @type {number}
+   */
+  get tkGridHeight() {
+    return this._tkGridHeight;
+  }
+
+  /**
+   * True if the input is in disabled state
+   * @type {boolean}
+   */
+  get isDisabled() {
+    return this._tkIsDisabled;
+  }
+
+  set isDisabled(value) {
+    if (value !== this._tkIsDisabled) {
+      this._tkIsDisabled = value;
+      this._tkUpdateVisuals();
+    }
+  }
+
+  /**
+   * True if the input is in focused state
+   * @type {boolean}
+   */
+  get isFocused() {
+    return this._tkIsFocused;
+  }
+
+  set isFocused(value) {
+    if (value !== this._tkIsFocused) {
+      this._tkIsFocused = value;
+      this._tkUpdateVisuals();
+      this._tkUpdateCursor();
+    }
+  }
+
+  /**
+   * The current position (in characters) of the cursor
+   * @type {number}
+   */
+  get tkCursorPos() {
+    return this._tkCursorPos;
+  }
+
+  set tkCursorPos(value) {
+    if (value !== this._tkCursorPos) {
+      this._tkCursorPos = value;
+      this._tkUpdateCursor();
+    }
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  /**
+   * Destroys the input, frees up the resources
+   * @returns {void}
+   *
+   */
+  destroy() {
+    this.off("pointerdown", this._onPointerDown, this);
+    window.removeEventListener("keydown", this.onKeyDown);
+
+    super.destroy();
+  }
+}
+
+export default TkInput;
