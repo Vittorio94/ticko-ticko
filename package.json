@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "dev": "vite",
     "createJsonSheets": "node createJsonSheets.js",
-    "docs": "jsdoc --configure jsdoc.conf.json --verbose"
+    "docs": "jsdoc --configure jsdoc.conf.json --verbose --package ''"
   },
   "dependencies": {
     "pixi.js": "^8.8.1"
