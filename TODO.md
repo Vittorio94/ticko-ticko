@@ -1,13 +1,8 @@
 # TODO
 
-- [ ] tkInput: add blur event
-- [ ] tkInput: add input event
-- [ ] tkInput: add changed event
 - [ ] tkInput: make sure that only the characters in the font atlas are available
 
 - [ ] general: unfocus current focused element when user clicks somewhere on the canvas
-
-- [ ] tkButton: add flair support (little icon in one of the corners)
 
 - [ ] tkLabel: plan all the required functionality
 - [ ] tkLabel: create base class
@@ -33,3 +28,10 @@
 # WORKING
 
 # DONE
+
+- [x] tkInput: add blur event
+- [x] tkInput: add input event
+- [x] tkInput: add changed event
+- [x] tkInput: make width adjustable, make height always be 1 tile
+
+- [x] tkButton: made loading spinner more visible

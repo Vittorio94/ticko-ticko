@@ -56,13 +56,28 @@ export default async function initUI() {
   globalThis.tkFocusIndicator = new TkFocusIndicator({});
   globalThis.tkFocusIndicator.visible = false;
 
-  const button = new TkButton({ tkGridX: 2, tkGridY: 2 });
-  const input = new TkInput({
-    tkValue: "hello",
+  const button = new TkButton({
+    tkTextContent: "button",
     tkGridX: 2,
-    tkGridY: 4,
+    tkGridY: 2,
     tkGridWidth: 4,
   });
+  button.isLoading = true;
+  button.isDisabled = true;
+  const input = new TkInput({
+    tkValue: "hello world",
+    tkGridX: 2,
+    tkGridY: 4,
+    tkGridWidth: 2,
+  });
+  input.tkGridWidth = 4;
+
+  const f = (e) => {
+    console.log(e);
+    console.log(e.detail);
+  };
+  input.on("blur", f);
+
   app.stage.addChild(button, input);
 
   //focusElement(input);

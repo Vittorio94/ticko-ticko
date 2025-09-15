@@ -50,6 +50,7 @@ export function focusElement(element) {
 
   if (!element) {
     currentFocusElement = undefined;
+    globalThis.tkFocusIndicator.visible = false;
     return;
   }
 

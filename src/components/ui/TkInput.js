@@ -213,9 +213,6 @@ class TkInput extends Container {
 
     // add sprites to the different state containers
     if (this._tkGridWidth === 2) {
-      this.tkNormalRightSprite.x = gridToPixel(this._tkGridWidth - 1);
-      this.tkDisabledRightSprite.x = gridToPixel(this._tkGridWidth - 1);
-      this.tkFocusedRightSprite.x = gridToPixel(this._tkGridWidth - 1);
       this.tkNormalInput.addChild(
         this.tkNormalLeftSprite,
         this.tkNormalRightSprite
@@ -229,17 +226,6 @@ class TkInput extends Container {
         this.tkFocusedRightSprite
       );
     } else {
-      this.tkNormalRightSprite.x = gridToPixel(this._tkGridWidth - 1);
-      this.tkDisabledRightSprite.x = gridToPixel(this._tkGridWidth - 1);
-      this.tkFocusedRightSprite.x = gridToPixel(this._tkGridWidth - 1);
-
-      this.tkNormalCenterSprite.x = gridToPixel(1);
-      this.tkNormalCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
-      this.tkDisabledCenterSprite.x = gridToPixel(1);
-      this.tkDisabledCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
-      this.tkFocusedCenterSprite.x = gridToPixel(1);
-      this.tkFocusedCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
-
       this.tkNormalInput.addChild(
         this.tkNormalLeftSprite,
         this.tkNormalCenterSprite,
@@ -301,9 +287,36 @@ class TkInput extends Container {
       !this.tkText ||
       !this.tkNormalInput ||
       !this.tkDisabledInput ||
-      !this.tkFocusedInput
+      !this.tkFocusedInput ||
+      !this.tkNormalLeftSprite ||
+      !this.tkNormalCenterSprite ||
+      !this.tkNormalRightSprite ||
+      !this.tkFocusedLeftSprite ||
+      !this.tkFocusedCenterSprite ||
+      !this.tkFocusedRightSprite ||
+      !this.tkDisabledLeftSprite ||
+      !this.tkDisabledCenterSprite ||
+      !this.tkDisabledRightSprite
     ) {
       return;
+    }
+
+    // update width
+    if (this._tkGridWidth === 2) {
+      this.tkNormalRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkDisabledRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkFocusedRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+    } else {
+      this.tkNormalRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkDisabledRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+      this.tkFocusedRightSprite.x = gridToPixel(this._tkGridWidth - 1);
+
+      this.tkNormalCenterSprite.x = gridToPixel(1);
+      this.tkNormalCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
+      this.tkDisabledCenterSprite.x = gridToPixel(1);
+      this.tkDisabledCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
+      this.tkFocusedCenterSprite.x = gridToPixel(1);
+      this.tkFocusedCenterSprite.width = gridToPixel(this._tkGridWidth - 2);
     }
 
     // Update text content
@@ -382,8 +395,7 @@ class TkInput extends Container {
 
     switch (e.key) {
       case "Enter":
-        // TODO: emit submit event
-        console.log("Input submitted:", this._tkValue); // Replace with your logic
+        // unfocus element
         focusElement(undefined);
         break;
       case "Backspace":
@@ -422,7 +434,6 @@ class TkInput extends Container {
           this._tkFirstCharIndex++;
         }
         break;
-      // Add Home/End if needed: e.key === "Home" -> _tkCursorPos = 0; etc.
       default:
         // Handle printable characters (alphanumeric, symbols)
         if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -444,6 +455,32 @@ class TkInput extends Container {
   };
 
   /**
+   * Fires the "input" event
+   * @private
+   */
+  _triggerInputEvent() {
+    const event = new CustomEvent("input", {
+      detail: this,
+      bubbles: true,
+    });
+
+    this.emit("input", event);
+  }
+
+  /**
+   * Fires the "blur" event
+   * @private
+   */
+  _triggerBlurEvent() {
+    const event = new CustomEvent("blur", {
+      detail: this,
+      bubbles: true,
+    });
+
+    this.emit("blur", event);
+  }
+
+  /**
    * The text content of the input
    * @type {string}
    */
@@ -455,6 +492,7 @@ class TkInput extends Container {
     if (this._tkValue !== value) {
       this._tkValue = value;
       this._tkUpdateVisuals();
+      this._triggerInputEvent();
     }
   }
 
@@ -496,12 +534,37 @@ class TkInput extends Container {
     return this._tkGridWidth;
   }
 
-  /**
-   * The height of the input in grid units
-   * @type {number}
-   */
-  get tkGridHeight() {
-    return this._tkGridHeight;
+  set tkGridWidth(value) {
+    if (
+      !this.tkNormalInput ||
+      !this.tkDisabledInput ||
+      !this.tkFocusedInput ||
+      !this.tkNormalCenterSprite ||
+      !this.tkFocusedCenterSprite ||
+      !this.tkDisabledCenterSprite
+    ) {
+      return;
+    }
+
+    if (this._tkGridWidth !== value) {
+      if (value <= 2 && this._tkGridWidth > 2) {
+        // remove center sprite
+        this.tkNormalInput.removeChild(this.tkNormalCenterSprite);
+        this.tkFocusedInput.removeChild(this.tkFocusedCenterSprite);
+        this.tkDisabledInput.removeChild(this.tkDisabledCenterSprite);
+      }
+
+      if (value > 2 && this._tkGridWidth <= 2) {
+        // add center sprite
+        this.tkNormalInput.addChild(this.tkNormalCenterSprite);
+        this.tkFocusedInput.addChild(this.tkFocusedCenterSprite);
+        this.tkDisabledInput.addChild(this.tkDisabledCenterSprite);
+      }
+      this._tkGridWidth = value;
+      this._tkMaxChars = this._tkGridWidth * 3 - 2;
+
+      this._tkUpdateVisuals();
+    }
   }
 
   /**
@@ -530,6 +593,23 @@ class TkInput extends Container {
   set isFocused(value) {
     if (value !== this._tkIsFocused) {
       this._tkIsFocused = value;
+      if (this._tkIsFocused) {
+        // display end of text
+        this._tkFirstCharIndex = Math.max(
+          this._tkValue.length - this._tkMaxChars,
+          0
+        );
+        this._tkCursorPos = this._tkValue.length;
+      } else {
+        // display start of text
+        this._tkFirstCharIndex = 0;
+        this._tkCursorPos = 0;
+
+        // trigger blur event
+        this._triggerBlurEvent();
+      }
+
+      // update visuals
       this._tkUpdateVisuals();
       this._tkUpdateCursor();
     }

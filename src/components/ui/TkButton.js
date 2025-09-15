@@ -536,7 +536,8 @@ class TkButton extends Container {
 
     // find position for loading spinner
     //let spinnerX = Math.round(this.width / 2 - TK_TILE_SIZE / 4);
-    let spinnerX = 4;
+    //let spinnerX = Math.round(this.width / 2 - this.tkSpinner.width / 2);
+    let spinnerX = Math.round(this.width / 2 - this.tkSpinner.width / 2);
     let spinnerY = TK_TILE_SIZE / 2 - Math.round(TK_TILE_SIZE / 4);
 
     // update x and y coordinate of the loading spinner
