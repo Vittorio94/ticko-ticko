@@ -13,8 +13,10 @@
 - [ ] tkIconButton: plan all the required functionality
 - [ ] tkIconButton: create base class
 
-- [ ] tkCheckbox: plan all the required functionality
 - [ ] tkCheckbox: create base class
+- [ ] tkCheckbox: isChecked, isFocused, isDisabled, isUndetermined statuses
+- [ ] tkCheckbox: create sprites in atlas
+
 
 - [ ] tkRadioButton: plan all the required functionality
 - [ ] tkRadioButton: create base class
@@ -26,6 +28,7 @@
 - [ ] tkSelectOption: create base class
 
 # WORKING
+- [ ] tkCheckbox: plan all the required functionality
 
 # DONE
 
