@@ -15,7 +15,7 @@
 
 - [ ] tkCheckbox: create base class
 - [ ] tkCheckbox: isChecked, isFocused, isDisabled, isUndetermined statuses
-- [ ] tkCheckbox: create sprites in atlas
+- [ ] tkCheckbox: add the "input" custom event
 
 
 - [ ] tkRadioButton: plan all the required functionality
@@ -28,7 +28,6 @@
 - [ ] tkSelectOption: create base class
 
 # WORKING
-- [ ] tkCheckbox: plan all the required functionality
 
 # DONE
 
@@ -38,3 +37,6 @@
 - [x] tkInput: make width adjustable, make height always be 1 tile
 
 - [x] tkButton: made loading spinner more visible
+
+- [x] tkCheckbox: plan all the required functionality
+- [x] tkCheckbox: create sprites in atlas

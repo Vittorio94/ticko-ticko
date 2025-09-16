@@ -116,6 +116,45 @@ function createGuiSheet() {
     h: tileSize,
   });
 
+  // checkboxes
+  guiSheet.frames[`checkbox-normal-unchecked.png`] = createFrame({
+    x: tileSize * 3,
+    y: tileSize * 4,
+    w: tileSize,
+    h: tileSize,
+  });
+  guiSheet.frames[`checkbox-normal-checked.png`] = createFrame({
+    x: tileSize * 4,
+    y: tileSize * 4,
+    w: tileSize,
+    h: tileSize,
+  });
+  guiSheet.frames[`checkbox-normal-undetermined.png`] = createFrame({
+    x: tileSize * 5,
+    y: tileSize * 4,
+    w: tileSize,
+    h: tileSize,
+  });
+
+  guiSheet.frames[`checkbox-disabled-unchecked.png`] = createFrame({
+    x: tileSize * 3,
+    y: tileSize * 5,
+    w: tileSize,
+    h: tileSize,
+  });
+  guiSheet.frames[`checkbox-disabled-checked.png`] = createFrame({
+    x: tileSize * 4,
+    y: tileSize * 5,
+    w: tileSize,
+    h: tileSize,
+  });
+  guiSheet.frames[`checkbox-disabled-undetermined.png`] = createFrame({
+    x: tileSize * 5,
+    y: tileSize * 5,
+    w: tileSize,
+    h: tileSize,
+  });
+
   //half tile loading spinner
   guiSheet.frames["loading-spinner-small-1.png"] = createFrame({
     x: tileSize * 16,

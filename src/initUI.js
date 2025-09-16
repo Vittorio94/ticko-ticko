@@ -86,9 +86,9 @@ export default async function initUI() {
   app.stage.addChild(globalThis.tkFocusIndicator);
 
   // test sprite
-  const sprite = new Sprite(tkSheets.guiSheet.textures["red-1.png"]);
+  const sprite = new Sprite(tkSheets.guiSheet.textures["checkbox-normal-checked.png"]);
   sprite.x = 500;
   sprite.y = 500;
 
-  //app.stage.addChild(sprite);
+  app.stage.addChild(sprite);
 }
