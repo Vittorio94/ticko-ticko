@@ -11,6 +11,7 @@ import TkButton from "./components/ui/TkButton";
 import TkFocusIndicator from "./components/ui/TkFocusIndicator";
 import { focusElement } from "./utils";
 import TkInput from "./components/ui/TkInput";
+import TkCheckbox from "./components/ui/TkCheckbox";
 
 /**
  * Initializes the application UI, loading assets fonts and sounds
@@ -62,8 +63,7 @@ export default async function initUI() {
     tkGridY: 2,
     tkGridWidth: 4,
   });
-  button.isLoading = true;
-  button.isDisabled = true;
+
   const input = new TkInput({
     tkValue: "hello world",
     tkGridX: 2,
@@ -71,14 +71,19 @@ export default async function initUI() {
     tkGridWidth: 2,
   });
   input.tkGridWidth = 4;
-
   const f = (e) => {
     console.log(e);
     console.log(e.detail);
   };
   input.on("blur", f);
 
-  app.stage.addChild(button, input);
+  const checkbox = new TkCheckbox({
+    tkGridX: 2,
+    tkGridY: 6,
+  });
+
+
+  app.stage.addChild(button, input, checkbox);
 
   //focusElement(input);
 
@@ -90,5 +95,5 @@ export default async function initUI() {
   sprite.x = 500;
   sprite.y = 500;
 
-  app.stage.addChild(sprite);
+  //app.stage.addChild(sprite);
 }

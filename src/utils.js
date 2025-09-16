@@ -9,6 +9,7 @@ import TkInput from "./components/ui/TkInput.js";
 import { TK_TILE_SIZE } from "./GLOBALS.js";
 import tkSheets from "./TkSheets.js";
 import TkFocusIndicator from "./components/ui/TkFocusIndicator.js";
+import TkCheckbox from "./components/ui/TkCheckbox.js";
 
 /**
  * the pixijs element that is currently in focus
@@ -38,7 +39,7 @@ export function gridToPixel(gridValue) {
  * Focuses the given pixijs element by setting its isFocused property to true.
  * If a previously focused element exists, sets its isFocused property to false.
  * Moves the focus indicators around the element.
- * @param {TkButton|TkInput|undefined} element - the element to focus.
+ * @param {TkButton|TkInput|TkCheckbox|undefined} element - the element to focus.
  */
 export function focusElement(element) {
   if (currentFocusElement) {

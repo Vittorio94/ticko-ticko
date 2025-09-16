@@ -13,9 +13,6 @@
 - [ ] tkIconButton: plan all the required functionality
 - [ ] tkIconButton: create base class
 
-- [ ] tkCheckbox: create base class
-- [ ] tkCheckbox: isChecked, isFocused, isDisabled, isUndetermined statuses
-- [ ] tkCheckbox: add the "input" custom event
 
 
 - [ ] tkRadioButton: plan all the required functionality
@@ -28,6 +25,9 @@
 - [ ] tkSelectOption: create base class
 
 # WORKING
+- [ ] tkCheckbox: create base class
+- [ ] tkCheckbox: isChecked, isFocused, isDisabled, isUndetermined statuses
+- [ ] tkCheckbox: add the "input" custom event
 
 # DONE
 

@@ -568,6 +568,14 @@ class TkInput extends Container {
   }
 
   /**
+   * The height of the input in grid units
+   * @type {number}
+   */
+  get tkGridHeight() {
+    return this._tkGridHeight;
+  }
+
+  /**
    * True if the input is in disabled state
    * @type {boolean}
    */

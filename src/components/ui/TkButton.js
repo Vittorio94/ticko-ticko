@@ -56,9 +56,6 @@ class TkButton extends Container {
     this._tkGridX = tkGridX;
 
     /** @private */
-    this._tkGridX = tkGridX;
-
-    /** @private */
     this._tkGridY = tkGridY;
 
     /** @private */
