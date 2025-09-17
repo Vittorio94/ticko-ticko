@@ -299,6 +299,7 @@ class TkCheckbox extends Container {
     if (value !== this._tkStatus) {
       this._tkStatus = value;
       this._tkUpdateVisuals();
+      this._triggerInputEvent();
     }
   }
 
@@ -315,6 +316,19 @@ class TkCheckbox extends Container {
       this._tkIsFocused = value;
       this._tkUpdateVisuals();
     }
+  }
+
+  /**
+   * Fires the "input" event
+   * @private
+   */
+  _triggerInputEvent() {
+    const event = new CustomEvent("input", {
+      detail: this,
+      bubbles: true,
+    });
+
+    this.emit("input", event);
   }
 
   /**

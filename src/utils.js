@@ -68,3 +68,30 @@ export function focusElement(element) {
   globalThis.tkFocusIndicator.tkGridHeight = element.tkGridHeight;
   globalThis.tkFocusIndicator.visible = true;
 }
+
+/**
+ * convert a hex color value to rgb
+ * @param {string} hex - the hex value
+ * @returns {number[]|null} - the rgb values
+ */
+export function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16),
+      ]
+    : null;
+}
+
+/**
+ * converts r,g,b to a hex color value
+ * @param {number} r - The red color value
+ * @param {number} g - The green color value
+ * @param {number} b - The blue color value
+ * @returns {string|null} - the hex string
+ */
+export function rgbToHex(r, g, b) {
+  return "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+}

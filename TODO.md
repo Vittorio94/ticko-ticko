@@ -4,16 +4,13 @@
 
 - [ ] general: unfocus current focused element when user clicks somewhere on the canvas
 
-- [ ] tkLabel: plan all the required functionality
-- [ ] tkLabel: create base class
+- [ ] tkTypography: create base class
 
 - [ ] tkIcon: plan all the required functionality
 - [ ] tkIcon: create base class
 
 - [ ] tkIconButton: plan all the required functionality
 - [ ] tkIconButton: create base class
-
-
 
 - [ ] tkRadioButton: plan all the required functionality
 - [ ] tkRadioButton: create base class
@@ -25,9 +22,9 @@
 - [ ] tkSelectOption: create base class
 
 # WORKING
-- [ ] tkCheckbox: create base class
-- [ ] tkCheckbox: isChecked, isFocused, isDisabled, isUndetermined statuses
-- [ ] tkCheckbox: add the "input" custom event
+- [ ] tkTyporaphy: create base class
+- [ ] tkTyporaphy: decide selection of fonts and sizes
+
 
 # DONE
 
@@ -40,3 +37,24 @@
 
 - [x] tkCheckbox: plan all the required functionality
 - [x] tkCheckbox: create sprites in atlas
+- [x] tkCheckbox: create base class
+- [x] tkCheckbox: isChecked, isFocused, isDisabled, isUndetermined statuses
+- [x] tkCheckbox: add the "input" custom event
+
+- [x] tkTypography: plan all the required functionality
+
+-----------------------------------------------------
+
+# Typography planning
+- font selection (regular, bold)
+- size (tiny, medium, big)
+- color (must work with hex as well as theme colors)
+- text decorations (underline, strike through)
+- link functionality (works like an html link basically)
+- text alignment
+- text direction (maybe)
+- text background color
+
+
+
+

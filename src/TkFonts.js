@@ -49,6 +49,8 @@ class TkFonts {
       //"PixelOperatorMono8-Bold-16",
       //"PixelOperatorHB-32",
       //"PixelOperatorMono8-Bold-32",
+      "Pixeleris8",
+      "Pixeleris16",
     ];
   }
 
